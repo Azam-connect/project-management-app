@@ -86,7 +86,7 @@ class UserService {
   // Get user info by ID (for profile or auth validation)
   async getUserById(req, res, next) {
     try {
-      const userId = (req.params?.id || req.user?.userId) || null; // Use ID from request params or authenticated user
+      const userId = req.params?.id || req.user?.userId || null; // Use ID from request params or authenticated user
       if (!userId) throw new Error('User ID is required');
       const user = await User.findById(userId).select('-password');
       if (!user) throw new Error('User not found');
@@ -127,6 +127,43 @@ class UserService {
       if (!user) throw new Error('User not found');
 
       return user;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  // Get list of users with pagination
+  async getUserList(req, res, next) {
+    try {
+      // Default page & limit if not provided
+      const page = parseInt(req.query.page, 10) || 1;
+      const limit = parseInt(req.query.limit, 10) || 10;
+
+      if (page < 1 || limit < 1) {
+        throw new Error('Page and limit must be positive integers');
+      }
+
+      const skip = (page - 1) * limit;
+
+      // Fetch users with pagination, exclude password
+      const users = await User.find()
+        .select('-password')
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 }); // Newest first
+
+      // Total users count
+      const totalUsers = await User.countDocuments();
+
+      return {
+        users,
+        pagination: {
+          currentPage: page,
+          pageSize: limit,
+          totalUsers,
+          totalPages: Math.ceil(totalUsers / limit),
+        },
+      };
     } catch (err) {
       throw err;
     }

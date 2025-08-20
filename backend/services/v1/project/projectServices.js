@@ -1,0 +1,99 @@
+const {Project} = require("../../../models");
+
+class ProjectService {
+  // Create new project
+  async createProject(req, res, next) {
+    try {
+      const { title, description, teamMembers } = req.body;
+
+      const { error } = projectSchema.validate({
+        title,
+        description,
+        teamMembers,
+      });
+      if (error) throw new Error(error.details[0].message);
+
+      const createdBy = req.user.userId; // Assuming auth middleware sets this
+
+      const project = new Project({
+        title,
+        description,
+        createdBy,
+        teamMembers: teamMembers || [],
+      });
+
+      await project.save();
+
+      return project;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  // Get all projects a user is part of
+  async getUserProjects(userId) {
+    try {
+      const projects = await Project.find({
+        teamMembers: userId,
+      }).populate('createdBy', 'name email');
+
+      return projects;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  // Get single project by ID with team member details
+  async getProjectById(projectId) {
+    try {
+      const project = await Project.findById(projectId)
+        .populate('createdBy', 'name email')
+        .populate('teamMembers', 'name email');
+      if (!project) throw new Error('Project not found');
+      return project;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  // Update a project (title, description, teamMembers)
+  async updateProject(req, res, next) {
+    try {
+      const projectId = req.params.id;
+      const { title, description, teamMembers } = req.body;
+
+      const { error } = projectSchema.validate({
+        title,
+        description,
+        teamMembers,
+      });
+      if (error) throw new Error(error.details[0].message);
+
+      const updates = { title, description, teamMembers };
+
+      const project = await Project.findByIdAndUpdate(projectId, updates, {
+        new: true,
+        runValidators: true,
+      });
+
+      if (!project) throw new Error('Project not found');
+
+      return project;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  // Delete a project
+  async deleteProject(projectId) {
+    try {
+      const project = await Project.findByIdAndDelete(projectId);
+      if (!project) throw new Error('Project not found');
+      return { success: true };
+    } catch (err) {
+      throw err;
+    }
+  }
+}
+
+module.exports = new ProjectService();

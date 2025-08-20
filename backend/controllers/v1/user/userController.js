@@ -1,7 +1,6 @@
 const { UserService } = require('../../../services');
 
 class UserController {
-
   async register(req, res, next) {
     try {
       const user = await UserService.registerUser(req, res, next);
@@ -31,10 +30,17 @@ class UserController {
 
   async updateUser(req, res, next) {
     try {
-      const updatedUser = await UserService.updateUser(
-        req,res, next
-      );
+      const updatedUser = await UserService.updateUser(req, res, next);
       return res.status(200).json(updatedUser);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getUserList(req, res, next) {
+    try {
+      const users = await UserService.getUserList(req, res, next);
+      return res.status(200).json(users);
     } catch (error) {
       next(error);
     }
