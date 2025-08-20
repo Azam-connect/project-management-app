@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { PmaDB } = require('../../config/dbConnection');
+const { PmaDB } = require('../../../config/dbConnection');
 
 const ProjectSchema = new mongoose.Schema(
   {
