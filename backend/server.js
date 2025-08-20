@@ -16,6 +16,7 @@ app.use(cors());
 app.disable('x-powered-by');
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
+app.use('/uploads', express.static('uploads'));
 const allowedOrigins = [];
 
 const origins = allowedOrigins.length === 0 ? '*' : allowedOrigins;
