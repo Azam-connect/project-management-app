@@ -146,14 +146,15 @@ class UserService {
       const skip = (page - 1) * limit;
 
       // Fetch users with pagination, exclude password
-      const users = await User.find()
-        .select('-password')
-        .skip(skip)
-        .limit(limit)
-        .sort({ createdAt: -1 }); // Newest first
+      const [users, totalUsers] = await Promise.all([
+        User.find()
+          .select('-password')
+          .skip(skip)
+          .limit(limit)
+          .sort({ createdAt: -1 }),
+        User.countDocuments(),
+      ]); // Newest first
 
-      // Total users count
-      const totalUsers = await User.countDocuments();
 
       return {
         users,
