@@ -64,8 +64,10 @@ class TaskService {
   async getTaskById(taskId) {
     try {
       const task = await Task.findById(taskId).populate(
-        'assignedTo',
-        'name email'
+        [{
+          path: 'assignedTo',
+          select: 'name email'
+        }]
       );
       if (!task) throw new Error('Task not found');
       return task;
