@@ -5,7 +5,7 @@ const cors = require("cors");
 const helmet = require("helmet")
 const { log } = require("./utils/debugger");
 const bodyParser = require("body-parser");
-// const router = require("./routes");
+const router = require("./routes");
 
 
 const app = express();
@@ -38,7 +38,7 @@ app.use((req, res, next) => {
     res.removeHeader('x-powered-by');
     next();
 });
-// app.use("/api", router);
+app.use("/api", router);
 
 app.get('/', async (req, res) => {
     return res.status(200).json({ message: 'Welcome to Project Management App API' });
