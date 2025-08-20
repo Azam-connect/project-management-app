@@ -39,6 +39,6 @@ const connectDatabase = () => {
     });
     return db;
 };
-const PmaUDB = connectDatabase();
+const PmaDB = connectDatabase();
 
-module.exports = { PmaUDB };
+module.exports = { PmaDB };
