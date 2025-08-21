@@ -93,6 +93,7 @@ class TaskService {
           path: 'assignedTo',
           select: 'name email',
         },
+        { path: 'comments.user', select: 'name email' },
       ]);
       if (!task) throw new Error('Task not found');
       return task;
@@ -119,7 +120,10 @@ class TaskService {
       const task = await Task.findByIdAndUpdate(taskId, updates, {
         new: true,
         runValidators: true,
-      });
+      }).populate([
+        { path: 'assignedTo', select: 'name email' },
+        { path: 'comments.user', select: 'name email' },
+      ]);
 
       if (!task) throw new Error('Task not found');
 
@@ -135,6 +139,37 @@ class TaskService {
       const task = await Task.findByIdAndDelete(taskId);
       if (!task) throw new Error('Task not found');
       return { success: true, message: 'Task deleted successfully' };
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  // Add a comment to a task
+  async addCommentToTask(req, res, next) {
+    try {
+      const taskId = req.params.taskId;
+      const { message } = req.body;
+      const userId = req.user.userId; // Assumes auth middleware
+
+      if (!message || message.trim() === '')
+        throw new Error('Comment message is required');
+
+      // Create comment object
+      const comment = {
+        user: userId,
+        message,
+      };
+
+      // Push comment into the task's comments array
+      const task = await Task.findByIdAndUpdate(
+        taskId,
+        { $push: { comments: comment } },
+        { new: true }
+      ).populate('comments.user', 'name email'); // Populate user info in comments
+
+      if (!task) throw new Error('Task not found');
+
+      return task.comments; // Return updated comments array
     } catch (err) {
       throw err;
     }

@@ -26,5 +26,6 @@ router.put(
   TaskController.updateTask
 );
 router.delete('/purge/:taskId', validateAccessToken, TaskController.updateTask);
+router.post('/add-comment/:taskId', validateAccessToken, TaskController.addCommentToTask);
 
 module.exports = router;
