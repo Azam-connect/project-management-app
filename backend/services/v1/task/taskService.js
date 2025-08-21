@@ -76,7 +76,7 @@ class TaskService {
         pagination: {
           currentPage: page,
           pageSize: limit,
-          totalTasks,
+          totalRecord: totalTasks,
           totalPages: Math.ceil(totalTasks / limit),
         },
       };

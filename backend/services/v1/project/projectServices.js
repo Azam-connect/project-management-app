@@ -54,7 +54,7 @@ class ProjectService {
         pagination: {
           currentPage: page,
           pageSize: limit,
-          totalProjects,
+          totalRecord: totalProjects,
           totalPages: Math.ceil(totalProjects / limit),
         },
       };
@@ -98,7 +98,7 @@ class ProjectService {
         pagination: {
           currentPage: page,
           pageSize: limit,
-          totalProjects,
+          totalRecord: totalProjects,
           totalPages: Math.ceil(totalProjects / limit),
         },
       };

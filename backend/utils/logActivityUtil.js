@@ -1,11 +1,13 @@
 const { ActivityLog } = require('../models');
+const {log} = require('./debugger')
 
 const logActivity = async (activityDate) => {
   try {
     const activityLog = new ActivityLog(activityDate);
     await activityLog.save();
   } catch (error) {
-    console.error('Error logging activity:', error);
+    log('Error logging activity:', error);
+    throw error;
   }
 };
 
