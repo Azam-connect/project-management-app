@@ -32,8 +32,8 @@ class ProjectService {
   async getProjects(req, res, next) {
     try {
       // Default page & limit if not provided
-      const page = parseInt(req.query.page, 10) || 1;
-      const limit = parseInt(req.query.limit, 10) || 10;
+      const page = parseInt(req.query.currentPage, 10) || 1;
+      const limit = parseInt(req.query.pageSize, 10) || 10;
 
       if (page < 1 || limit < 1) {
         throw new Error('Page and limit must be positive integers');
@@ -71,8 +71,8 @@ class ProjectService {
         throw new Error('User ID is required');
       }
       // Default page & limit if not provided
-      const page = parseInt(req.query.page, 10) || 1;
-      const limit = parseInt(req.query.limit, 10) || 10;
+      const page = parseInt(req.query.currentPage, 10) || 1;
+      const limit = parseInt(req.query.pageSize, 10) || 10;
 
       if (page < 1 || limit < 1) {
         throw new Error('Page and limit must be positive integers');

@@ -173,8 +173,8 @@ class UserService {
   async getUserList(req, res, next) {
     try {
       // Default page & limit if not provided
-      const page = parseInt(req.query.page, 10) || 1;
-      const limit = parseInt(req.query.limit, 10) || 10;
+      const page = parseInt(req.query.currentPage, 10) || 1;
+      const limit = parseInt(req.query.pageSize, 10) || 10;
 
       if (page < 1 || limit < 1) {
         throw new Error('Page and limit must be positive integers');
@@ -182,9 +182,21 @@ class UserService {
 
       const skip = (page - 1) * limit;
 
+      let query = {};
+
+      if (req.query.search) {
+        const search = req.query.search.trim();
+        query = {
+          $or: [
+            { name: { $regex: search, $options: 'i' } },
+            { email: { $regex: search, $options: 'i' } },
+          ],
+        };
+      }
+
       // Fetch users with pagination, exclude password
       const [users, totalUsers] = await Promise.all([
-        User.find()
+        User.find(query)
           .select('-password')
           .skip(skip)
           .limit(limit)
@@ -197,7 +209,7 @@ class UserService {
         pagination: {
           currentPage: page,
           pageSize: limit,
-          totalUsers,
+          totalRecord: totalUsers,
           totalPages: Math.ceil(totalUsers / limit),
         },
       };
