@@ -116,12 +116,12 @@ class ReportService {
 
     const activities = await ActivityLog.find({
       user: userId,
-      timestamp: { $gte: new Date(startDate), $lte: new Date(endDate) },
-    }).sort({ timestamp: 1 });
+      createdAt: { $gte: new Date(startDate), $lte: new Date(endDate) },
+    }).sort({ createdAt: 1 });
 
     // Group by date (YYYY-MM-DD)
     const grouped = activities.reduce((acc, activity) => {
-      const day = activity.timestamp.toISOString().split('T')[0];
+      const day = activity.createdAt.toISOString().split('T')[0];
       if (!acc[day]) acc[day] = [];
       acc[day].push(activity);
       return acc;
@@ -141,18 +141,13 @@ class ReportService {
         const matchTask = { assignedTo: userId };
         if (projectId) matchTask.projectId = projectId;
 
-        const totalTasks = await Task.countDocuments(matchTask);
-        const completedTasks = await Task.countDocuments({
+        const [totalTasks, completedTasks, activityCount, user] = await Promise.all([Task.countDocuments(matchTask), Task.countDocuments({
           ...matchTask,
           status: 'done',
-        });
-
-        const activityCount = await ActivityLog.countDocuments({
+        }), ActivityLog.countDocuments({
           user: userId,
           ...(projectId && { projectId }),
-        });
-
-        const user = await User.findById(userId).select('name email');
+        }), User.findById(userId).select('name email')]);
 
         return {
           userId,
