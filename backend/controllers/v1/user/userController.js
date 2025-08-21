@@ -13,7 +13,27 @@ class UserController {
   async login(req, res, next) {
     try {
       const token = await UserService.loginUser(req, res, next);
-      return res.status(200).json({ token });
+      return res
+        .status(200)
+        .json({
+          user: token,
+          access_token: token.access_token,
+          refresh_token: token.refresh_token,
+        });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async refreshToken(req, res, next) {
+    try {
+      const { refresh_token } = req.body;
+      if (!refresh_token) {
+        return res.status(400).json({ error: 'Refresh token is required' });
+      }
+      const { access_token } =
+        await UserService.generateAccessTokenFromRefreshToken(refresh_token);
+      res.json({ access_token });
     } catch (error) {
       next(error);
     }

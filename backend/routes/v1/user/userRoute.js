@@ -7,6 +7,7 @@ const {
 
 router.post('/register', validateAccessToken, UserController.register);
 router.post('/login', UserController.login);
+router.post('/refresh-token', UserController.refreshToken);
 router.get('/profile-list', validateAccessToken, UserController.getUserList);
 router.get('/profile', validateAccessToken, UserController.getUserProfile);
 router.get('/profile/:id', validateAccessToken, UserController.getUserProfile);

@@ -28,7 +28,7 @@ class UserService {
   // Register new user
   async registerUser(req, res, next) {
     try {
-      let { name, email, password } = req.body;
+      let { name, email, password, role } = req.body;
 
       const { error } = registerSchema.validate({ name, email, password });
       if (error) throw new Error(error.details[0].message);
@@ -46,6 +46,7 @@ class UserService {
         name,
         email,
         password: hashedPassword,
+        role,
       });
 
       await user.save();
@@ -72,14 +73,50 @@ class UserService {
 
       // Create JWT payload
       const token = jwt.sign(
-        { userId: user._id, email: user.email },
+        { userId: user._id, email: user.email, role: user.role },
         this.jwtAccessTokenSecret,
         { expiresIn: this.jwtAccessTokenLife }
       );
 
-      return { token, userId: user._id, name: user.name, email: user.email };
+      // Create refresh token (longer-lived)
+      const refresh_token = jwt.sign(
+        { userId: user._id, email: user.email, role: user.role },
+        this.jwtRefreshTokenSecret, // Make sure this is set in env and constructor!
+        { expiresIn: this.jwtRefreshTokenLife } // e.g. '30d'
+      );
+
+      return {
+        access_token: token,
+        refresh_token,
+        userId: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      };
     } catch (err) {
       throw err;
+    }
+  }
+
+  // Verify the refresh token and create a new access token
+  async generateAccessTokenFromRefreshToken(refresh_token) {
+    try {
+      // Step 1: Verify the refresh token
+      const decoded = jwt.verify(refresh_token, this.jwtRefreshTokenSecret);
+      const { userId, email, role } = decoded;
+
+      // Step 2: Generate a new access token
+      const access_token = jwt.sign(
+        { userId, email, role },
+        this.jwtAccessTokenSecret,
+        { expiresIn: this.jwtAccessTokenLife }
+      );
+
+      // Step 3: Return new access token
+      return { access_token };
+    } catch (err) {
+      // If token invalid/expired
+      throw new Error('Invalid or expired refresh token');
     }
   }
 
@@ -154,7 +191,6 @@ class UserService {
           .sort({ createdAt: -1 }),
         User.countDocuments(),
       ]); // Newest first
-
 
       return {
         users,
