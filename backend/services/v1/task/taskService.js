@@ -5,7 +5,7 @@ const {
 
 class TaskService {
   // Create new task
-  async createTask(req, res, next) {
+  async createTask({ body }) {
     try {
       const {
         projectId,
@@ -15,10 +15,10 @@ class TaskService {
         status,
         deadline,
         attachments,
-      } = req.body;
+      } = body;
 
       // Basic validation (you can replace with Joi validation)
-      const { error } = taskSchema.validate(req.body);
+      const { error } = taskSchema.validate(body);
       if (error) throw new Error(error.details[0].message);
 
       if (!projectId) throw new Error('Project ID is required');
@@ -48,13 +48,38 @@ class TaskService {
     try {
       if (!projectId) throw new Error('Project ID is required');
 
-      const query = { projectId, ...filter };
+      // Default page & limit if not provided
+      const page = parseInt(filter?.page, 10) || 1;
+      const limit = parseInt(filter?.limit, 10) || 10;
 
-      const tasks = await Task.find(query)
-        .populate('assignedTo', 'name email')
-        .sort({ createdAt: -1 });
+      if (page < 1 || limit < 1) {
+        throw new Error('Page and limit must be positive integers');
+      }
 
-      return tasks;
+      const skip = (page - 1) * limit;
+      let query = { projectId };
+      if (filter?.status) {
+        query.status = filter.status;
+      }
+
+      const [tasks, totalTasks] = await Promise.all([
+        Task.find(query)
+          .populate('assignedTo', 'name email')
+          .skip(skip)
+          .limit(limit)
+          .sort({ createdAt: -1 }),
+        Task.countDocuments(query),
+      ]);
+
+      return {
+        tasks,
+        pagination: {
+          currentPage: page,
+          pageSize: limit,
+          totalTasks,
+          totalPages: Math.ceil(totalTasks / limit),
+        },
+      };
     } catch (err) {
       throw err;
     }
@@ -63,12 +88,12 @@ class TaskService {
   // Get single task by ID
   async getTaskById(taskId) {
     try {
-      const task = await Task.findById(taskId).populate(
-        [{
+      const task = await Task.findById(taskId).populate([
+        {
           path: 'assignedTo',
-          select: 'name email'
-        }]
-      );
+          select: 'name email',
+        },
+      ]);
       if (!task) throw new Error('Task not found');
       return task;
     } catch (err) {
@@ -77,11 +102,11 @@ class TaskService {
   }
 
   // Update task details
-  async updateTask(req, res, next) {
+  async updateTask({ params, body }) {
     try {
-      const taskId = req.params.id;
+      const taskId = params.taskId;
       const { title, description, assignedTo, status, deadline, attachments } =
-        req.body;
+        body;
 
       const updates = {};
       if (title !== undefined) updates.title = title;
@@ -109,7 +134,7 @@ class TaskService {
     try {
       const task = await Task.findByIdAndDelete(taskId);
       if (!task) throw new Error('Task not found');
-      return { success: true };
+      return { success: true, message: 'Task deleted successfully' };
     } catch (err) {
       throw err;
     }

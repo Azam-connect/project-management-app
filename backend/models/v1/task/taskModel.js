@@ -21,7 +21,7 @@ const TaskSchema = new mongoose.Schema(
     assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
     status: {
       type: String,
-      enum: ['todo', 'in-progress', 'testing', 'done'],
+      enum: ['todo', 'in-progress', 'testing', 'done', 'rejected'],
       default: 'todo',
     },
     deadline: { type: Date },

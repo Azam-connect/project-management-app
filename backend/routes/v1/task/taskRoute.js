@@ -5,5 +5,26 @@ const {
   validateAccessToken,
 } = require('../../../middlewares/validateAccessToken');
 
+const { upload } = require('../../../utils/fileUploadUtil');
+
+router.get(
+  '/list/:projectId',
+  validateAccessToken,
+  TaskController.getTasksByProject
+);
+router.get('/detail/:taskId', validateAccessToken, TaskController.getTaskById);
+router.post(
+  '/add',
+  validateAccessToken,
+  upload.array('attachments', 5), // Allow up to 5 attachments
+  TaskController.createTask
+);
+router.put(
+  '/modify/:taskId',
+  validateAccessToken,
+  upload.array('attachments', 5), // Allow up to 5 attachments
+  TaskController.updateTask
+);
+router.delete('/purge/:taskId', validateAccessToken, TaskController.updateTask);
 
 module.exports = router;

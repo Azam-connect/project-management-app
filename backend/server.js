@@ -3,6 +3,7 @@ dotenv.config();
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet")
+const path = require('path');
 const { log } = require("./utils/debugger");
 const bodyParser = require("body-parser");
 const router = require("./routes");
@@ -16,7 +17,7 @@ app.use(cors());
 app.disable('x-powered-by');
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 const allowedOrigins = [];
 
 const origins = allowedOrigins.length === 0 ? '*' : allowedOrigins;
