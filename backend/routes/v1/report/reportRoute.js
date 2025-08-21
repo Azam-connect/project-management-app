@@ -6,7 +6,7 @@ const {
 } = require('../../../middlewares/validateAccessToken');
 
 router.get(
-  '/project-report/:projectId',
+  '/project-report',
   validateAccessToken,
   ReportController.getProjectReportSummary
 );

@@ -3,7 +3,7 @@ const { ReportService } = require('../../../services');
 class ReportController {
   async getProjectReportSummary(req, res, next) {
     try {
-      const { projectId } = req.params;
+      const { projectId } = req.query;
       const report = await ReportService.getTaskCompletionReport(projectId);
       return res.status(200).json(report);
     } catch (error) {
