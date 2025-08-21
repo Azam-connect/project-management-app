@@ -141,7 +141,7 @@ class UserService {
       let updateData = req.body;
       const { error } = updateUserSchema.validate(updateData);
       if (error) throw new Error(error.details[0].message);
-      const allowedUpdates = ['name', 'email', 'password'];
+      const allowedUpdates = ['name', 'email', 'password', 'role'];
       const updates = {};
 
       for (const key of Object.keys(updateData)) {

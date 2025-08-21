@@ -13,6 +13,12 @@ const registerSchema = Joi.object({
     'string.min': 'Password should be at least 6 characters long',
     'string.empty': 'Password is required',
   }),
+  role: Joi.string()
+    .valid('admin', 'developer', 'tester')
+    .default('developer')
+    .messages({
+      'any.only': 'Role must be one of admin, developer, or tester',
+    }),
 });
 
 const loginSchema = Joi.object({
@@ -29,8 +35,14 @@ const updateUserSchema = Joi.object({
   name: Joi.string().min(3).max(30),
   email: Joi.string().email(),
   password: Joi.string().min(6),
-}).or('name', 'email', 'password').messages({
-  'object.missing': 'At least one field (name, email, or password) is required to update',
-});
+  role: Joi.string().valid('admin', 'developer', 'tester').messages({
+    'any.only': 'Role must be one of admin, developer, or tester',
+  }),
+})
+  .or('name', 'email', 'password', 'role')
+  .messages({
+    'object.missing':
+      'At least one field (name, email, or password) is required to update',
+  });
 
-module.exports = {registerSchema,loginSchema,updateUserSchema}
+module.exports = { registerSchema, loginSchema, updateUserSchema };

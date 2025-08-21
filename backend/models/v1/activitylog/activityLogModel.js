@@ -5,9 +5,10 @@ const ActivityLogSchema = new mongoose.Schema(
   {
     projectId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Project',
-      required: true,
+      ref: 'project',
+      // required: true,
     },
+    projectTitle: { type: String, required: true },
     taskId: { type: mongoose.Schema.Types.ObjectId, ref: 'task' },
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true },
     action: { type: String, required: true },
