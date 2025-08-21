@@ -67,6 +67,18 @@ class ReportController {
       next(error);
     }
   }
+
+  async exportTasksReport(req, res, next) {
+    try {
+      const { projectId } = req.query;
+      const report = await ReportService.exportTasksReport(projectId);
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename="tasks_report.csv"');
+      return res.status(200).json(report);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = new ReportController();

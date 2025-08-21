@@ -1,5 +1,5 @@
 const { Task, Project, User, ActivityLog } = require('../../../models');
-
+const ExcelJS = require('exceljs');
 class ReportService {
   // 1. Get task completion report by project
   async getTaskCompletionReport(projectId) {
@@ -171,16 +171,41 @@ class ReportService {
       .populate('assignedTo', 'name email')
       .sort({ deadline: 1 });
 
+    if (!tasks || tasks.length === 0) {
+      throw new Error('No tasks found for the specified project');
+    }
+
+    // Create workbook and worksheet
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Tasks Report');
+
+    // Define columns
+    worksheet.columns = [
+      { header: 'TaskId', key: 'TaskId', width: 30 },
+      { header: 'Title', key: 'Title', width: 30 },
+      { header: 'Description', key: 'Description', width: 40 },
+      { header: 'AssignedTo', key: 'AssignedTo', width: 25 },
+      { header: 'Status', key: 'Status', width: 15 },
+      { header: 'Deadline', key: 'Deadline', width: 20 },
+      { header: 'CreatedAt', key: 'CreatedAt', width: 20 },
+    ];
+
     // Map to simple objects for CSV export
-    return tasks.map((task) => ({
-      TaskId: task._id.toString(),
-      Title: task.title,
-      Description: task.description,
-      AssignedTo: task.assignedTo ? task.assignedTo.name : '',
-      Status: task.status,
-      Deadline: task.deadline ? task.deadline.toISOString().split('T')[0] : '',
-      CreatedAt: task.createdAt.toISOString().split('T')[0],
-    }));
+    tasks.map((task) => {
+      worksheet.addRow({
+        TaskId: task._id.toString(),
+        Title: task.title,
+        Description: task.description,
+        AssignedTo: task.assignedTo ? task.assignedTo.name : '',
+        Status: task.status,
+        Deadline: task.deadline ? task.deadline.toISOString().split('T')[0] : '',
+        CreatedAt: task.createdAt.toISOString().split('T')[0],
+      });
+    });
+
+    // Generate buffer for download
+    const buffer = await workbook.xlsx.writeBuffer();
+    return buffer;
   }
 }
 
