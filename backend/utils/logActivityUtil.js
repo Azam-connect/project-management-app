@@ -1,5 +1,5 @@
 const { ActivityLog } = require('../models');
-const {log} = require('./debugger')
+const { log } = require('./debugger');
 
 const logActivity = async (activityDate) => {
   try {
