@@ -49,7 +49,7 @@ class ProjectService {
       const skip = (page - 1) * limit;
       const [projects, totalProjects] = await Promise.all([
         Project.find()
-          .populate('createdBy', 'name email')
+          .populate([{path:'createdBy', select:'name email'},{path:'teamMembers', select:'name'}])
           .skip(skip)
           .limit(limit)
           .sort({ createdAt: -1 }),
