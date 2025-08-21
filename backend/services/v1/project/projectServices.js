@@ -1,5 +1,6 @@
 const { Project } = require('../../../models');
 const { projectSchema } = require('../../../validators');
+const { logActivity } = require('../../../utils/logActivityUtil');
 
 class ProjectService {
   // Create new project
@@ -21,7 +22,13 @@ class ProjectService {
       });
 
       await project.save();
-
+      await logActivity({
+        projectId: project._id,
+        projectTitle: project.title,
+        user: createdBy,
+        action: 'created',
+        detail: 'Project created successfully',
+      });
       return project;
     } catch (err) {
       throw err;
@@ -149,7 +156,13 @@ class ProjectService {
       });
 
       if (!project) throw new Error('Project not found');
-
+      await logActivity({
+        projectId: project._id,
+        projectTitle: project.title,
+        user: req.user.userId, // Assuming auth middleware sets this
+        action: 'updated',
+        detail: 'Project updated successfully',
+      });
       return project;
     } catch (err) {
       throw err;
@@ -166,6 +179,13 @@ class ProjectService {
       }
       const project = await Project.findByIdAndDelete(projectId);
       if (!project) throw new Error('Project not found');
+      await logActivity({
+        projectId: project._id,
+        projectTitle: project.title,
+        user: req.user.userId, // Assuming auth middleware sets this
+        action: 'deleted',
+        detail: 'Project deleted successfully',
+      });
       return { success: true };
     } catch (err) {
       throw err;
