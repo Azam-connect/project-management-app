@@ -167,7 +167,7 @@ The Project Management App follows a modular, service-oriented architecture with
 6. **Start Frontend (optional):**  
    `cd client && npm start`
 7. **API Testing:**  
-   Use Postman or Swagger (add swagger.json if required).
+   Use Postman.
 
 ---
 
