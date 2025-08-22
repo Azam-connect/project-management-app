@@ -83,7 +83,7 @@ The Project Management App follows a modular, service-oriented architecture with
   Provides user interface for login/signup, dashboard, project and task views, file uploads, comments, activity history, and notifications. All data is fetched and submitted via REST API calls.
 
 - **Node.js Express Backend:**  
-  Handles REST APIs, JWT authentication (access/refresh tokens), validation (with Joi), business logic (in service layers), file uploads (Multer), error handling, activity logging, and notification generation.
+  Handles REST APIs, JWT authentication (access/refresh tokens), validation (with Joi), business logic (in service layers), file uploads (Multer), error handling, activity logging.
 
 - **MongoDB (with Mongoose):**  
   Stores all persistent data—users, projects, tasks (with comments and attachments), activity logs, notifications.
