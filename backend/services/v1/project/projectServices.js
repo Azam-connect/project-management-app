@@ -1,6 +1,7 @@
-const { Project } = require('../../../models');
+const { Project, Task } = require('../../../models');
 const { projectSchema } = require('../../../validators');
 const { logActivity } = require('../../../utils/logActivityUtil');
+const { log } = require('../../../utils/debugger');
 
 class ProjectService {
   // Create new project
@@ -92,26 +93,40 @@ class ProjectService {
       const skip = (page - 1) * limit;
       let query = { teamMembers: userId };
       let taskQuery = { assignedTo: userId };
+      let projects = [];
+      let totalProjects = 0;
       if (status) {
         taskQuery.status = status;
         // Step 1: Get unique projectIds from tasks with desired status
         const taskProjectIds = await Task.distinct('projectId', taskQuery);
         if (taskProjectIds.length > 0) {
           query._id = { $in: taskProjectIds };
-        }
-      }
 
-      const [projects, totalProjects] = await Promise.all([
-        Project.find(query)
-          .populate([
-            { path: 'createdBy', select: 'name email' },
-            { path: 'teamMembers', select: 'name email' },
-          ])
-          .skip(skip)
-          .limit(limit)
-          .sort({ createdAt: -1 }),
-        Project.countDocuments(query),
-      ]); // Newest first
+          [projects, totalProjects] = await Promise.all([
+            Project.find(query)
+              .populate([
+                { path: 'createdBy', select: 'name email' },
+                { path: 'teamMembers', select: 'name email' },
+              ])
+              .skip(skip)
+              .limit(limit)
+              .sort({ createdAt: -1 }),
+            Project.countDocuments(query),
+          ]); // Newest first
+        }
+      } else {
+        [projects, totalProjects] = await Promise.all([
+          Project.find(query)
+            .populate([
+              { path: 'createdBy', select: 'name email' },
+              { path: 'teamMembers', select: 'name email' },
+            ])
+            .skip(skip)
+            .limit(limit)
+            .sort({ createdAt: -1 }),
+          Project.countDocuments(query),
+        ]); // Newest first
+      }
 
       return {
         projects,
