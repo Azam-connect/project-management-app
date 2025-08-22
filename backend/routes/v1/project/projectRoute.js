@@ -7,6 +7,11 @@ const {
 
 router.get('/list', validateAccessToken, ProjectController.getAllProjects);
 router.get(
+  '/user-projects',
+  validateAccessToken,
+  ProjectController.getUserProjects
+);
+router.get(
   '/user-projects/:id',
   validateAccessToken,
   ProjectController.getUserProjects
