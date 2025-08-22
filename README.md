@@ -56,26 +56,38 @@ This application helps teams and individuals manage projects, assign tasks, add 
 
 The Project Management App follows a modular, service-oriented architecture with clear separation of frontend, backend, database, and file storage:
 
-+---------------------+
-|   React Frontend    |
-+---------------------+
-           │
-           ▼
-+---------------------+
-| Node.js Express API |
-+---------------------+
-           │
-           ▼
-+-------------------------------+
-| MongoDB (Mongoose Models)     |
-+-------------------------------+
-           │
-           ▼
-+-----------------------+
-| File Storage (Local/Cloud) |
-+-----------------------+
 
----
+```text
+┌────────────────────┐
+|   React Frontend   |
+└─────────┬──────────┘
+          |
+          v   HTTP (REST API calls)
+┌────────────────────────────┐
+|     Node.js Express API    |
+└─────────┬────────┬─────────┘
+          |        |        
+          v        v        
+   Authentication  |
+   Middleware      |
+          |        |
+          v        v
+ ┌──────────────────────────────────────┐
+ | MongoDB (Mongoose Models)            |
+ | - User                               |
+ | - Project                            |
+ | - Task                               |
+ | - ActivityLog                        |
+ └──────────────────────────────────────┘
+          |
+          v
+ ┌──────────────────────────────────────┐
+ |   File Storage (Local/Cloud)         | 
+ |   (e.g., uploads/tasks/ or S3)       |
+ └──────────────────────────────────────┘
+
+ ```
+ ---
 
 ### Component Responsibilities
 
