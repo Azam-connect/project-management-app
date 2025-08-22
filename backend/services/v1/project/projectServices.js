@@ -49,7 +49,10 @@ class ProjectService {
       const skip = (page - 1) * limit;
       const [projects, totalProjects] = await Promise.all([
         Project.find()
-          .populate([{path:'createdBy', select:'name email'},{path:'teamMembers', select:'name'}])
+          .populate([
+            { path: 'createdBy', select: 'name email' },
+            { path: 'teamMembers', select: 'name' },
+          ])
           .skip(skip)
           .limit(limit)
           .sort({ createdAt: -1 }),
@@ -80,16 +83,26 @@ class ProjectService {
       // Default page & limit if not provided
       const page = parseInt(req.query.currentPage, 10) || 1;
       const limit = parseInt(req.query.pageSize, 10) || 10;
+      const status = req.query.status || null;
 
       if (page < 1 || limit < 1) {
         throw new Error('Page and limit must be positive integers');
       }
 
       const skip = (page - 1) * limit;
+      let query = { teamMembers: userId };
+      let taskQuery = { assignedTo: userId };
+      if (status) {
+        taskQuery.status = status;
+        // Step 1: Get unique projectIds from tasks with desired status
+        const taskProjectIds = await Task.distinct('projectId', taskQuery);
+        if (taskProjectIds.length > 0) {
+          query._id = { $in: taskProjectIds };
+        }
+      }
+
       const [projects, totalProjects] = await Promise.all([
-        Project.find({
-          teamMembers: userId,
-        })
+        Project.find(query)
           .populate([
             { path: 'createdBy', select: 'name email' },
             { path: 'teamMembers', select: 'name email' },
@@ -97,7 +110,7 @@ class ProjectService {
           .skip(skip)
           .limit(limit)
           .sort({ createdAt: -1 }),
-        Project.countDocuments(),
+        Project.countDocuments(query),
       ]); // Newest first
 
       return {
