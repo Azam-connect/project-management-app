@@ -164,10 +164,14 @@ The Project Management App follows a modular, service-oriented architecture with
 - `GET /api/v1/task/detail/:taskId` — Get task details
 - `POST /api/v1/task/add-comment/:taskId` — Add comment to task
 - `DELETE /api/v1/task/purge/:taskId` — Delete task
+- `GET /api/v1/report/project-report?projectId` — Get project's totalTasks, completedTasks, inProgressTasks, todoTasks, testingTasks
+- `GET /api/v1/report/project-tasks-count/:userId?projectId` — Get user's totalTasks, completedTasks if projectId passed then project wise else overall
+- `GET /api/v1/report/upcomming-tasks/:userId?daysAhead` —  Get tasks due soon (within next N days)
+- `GET /api/v1/report/user-project-summary/:userId` — Get user's projects summary
+- `GET /api/v1/report/user-daily-activity/:userId?startDate=&endDate=` — Get user's daily activity within date ranges
+- `POST /api/v1/report/user-comparion-report` — Get user's activities to compare (pass userIds and projectId in body)
+- `GET /api/v1/report/export-task-report?projectId` — Expor project tasks as CSV
 - `GET /api/activity/:projectId` — Get project activity log
-- `GET /api/reports/progress/:projectId` — Project progress report
-- `GET /api/reports/user/:userId` — User report
-- `GET /api/reports/export/:projectId` — Export project tasks as CSV
 
 ---
 
