@@ -34,7 +34,7 @@ This application helps teams and individuals manage projects, assign tasks, add 
 - **Auth:** JWT (Access/Refresh tokens)
 - **File Upload:** Multer
 - **Validation:** Joi
-- **Other:** Activity logs, notifications, report service
+- **Other:** Activity logs, report service
 
 ---
 
