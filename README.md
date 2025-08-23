@@ -171,7 +171,7 @@ The Project Management App follows a modular, service-oriented architecture with
 - `GET /api/v1/report/user-daily-activity/:userId?startDate=&endDate=` — Get user's daily activity within date ranges
 - `POST /api/v1/report/user-comparion-report` — Get user's activities to compare (pass userIds and projectId in body)
 - `GET /api/v1/report/export-task-report?projectId` — Expor project tasks as CSV
-- `GET /api/v1/activity/:projectId` — Get project activity log
+- `GET /api/v1/report/activity?projectId=&userId` — Get project activity log
 
 ---
 

@@ -207,6 +207,48 @@ class ReportService {
     const buffer = await workbook.xlsx.writeBuffer();
     return buffer;
   }
+
+  async activityLogReport({ projectId = null, user = null, page = 1, limit = 10 }) {
+    try {
+      let query = {}
+      if (projectId) {
+        query.projectId = projectId;
+      }
+      if (user) {
+        query.user = user;
+      }
+
+      if (page < 1 || limit < 1) {
+        throw new Error('Page and limit must be positive integers');
+      }
+
+      const skip = (page - 1) * limit;
+
+      const [activities, totalRecord] = await Promise.all([
+        ActivityLog.find(query)
+          .populate([
+            { path: "projectId", select: "title description" },
+            { path: "user", select: "name email role -password" }
+          ])
+          .skip(skip)
+          .limit(limit)
+          .sort({ createdAt: -1 }),
+        ActivityLog.countDocuments(query)
+      ]);
+
+      return {
+        activities,
+        pagination: {
+          currentPage: page,
+          pageSize: limit,
+          totalRecord,
+          totalPages: Math.ceil(totalRecord / limit),
+        }
+      }
+    } catch (err) {
+      throw err
+    }
+  }
 }
 
 module.exports = new ReportService();

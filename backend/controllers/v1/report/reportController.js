@@ -79,6 +79,29 @@ class ReportController {
       next(error);
     }
   }
+
+  async activityLogReport(req, res, next) {
+    try {
+      const { projectId, userId, currentPage, pageSize } = req.query;
+      dataSet = {}
+      if (projectId) {
+        dataSet.projectId = projectId;
+      }
+      if (user) {
+        dataSet.user = userId;
+      }
+      if (currentPage) {
+        dataSet.page = currentPage;
+      }
+      if (pageSize) {
+        dataSet.page = pageSize;
+      }
+      const activity = await ReportService.activityLogReport(dataSet);
+      return res.status(200).json(activity);
+    } catch (error) {
+      next(error)
+    }
+  }
 }
 
 module.exports = new ReportController();

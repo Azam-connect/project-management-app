@@ -36,5 +36,6 @@ router.post(
   ReportController.getUserComparison
 );
 router.get('/export-task-report', validateAccessToken, ReportController.exportTasksReport);
+router.get('/activity', validateAccessToken, ReportController.activityLogReport);
 
 module.exports = router;
