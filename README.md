@@ -203,6 +203,8 @@ The Project Management App follows a modular, service-oriented architecture with
 
    `docker-compose up -d`
 
+   `docker-compose exec backend npm run seeder`
+
 ---
 
 ## Reporting
