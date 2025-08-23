@@ -201,9 +201,10 @@ The Project Management App follows a modular, service-oriented architecture with
 **🐳 Run with Docker (Alternative)**
 -  **If you prefer Docker, after Step 1 (Clone Repo):**
 
-   `docker-compose up -d`
-
-   `docker-compose exec backend npm run seeder`
+1. **Run Docker Servive:**
+   - `docker-compose up -d`
+2. **Seed Admin user:**
+   - `docker-compose exec backend npm run seeder`
 
 ---
 
