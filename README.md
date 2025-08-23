@@ -92,16 +92,16 @@ The Project Management App follows a modular, service-oriented architecture with
 ### Component Responsibilities
 
 - **React Frontend:**  
-  Provides user interface for login/signup, dashboard, project and task views, file uploads, comments, activity history, and notifications. All data is fetched and submitted via REST API calls.
+  Provides user interface for login/signup, dashboard, project and task views, file uploads, comments, activity history. All data is fetched and submitted via REST API calls.
 
 - **Node.js Express Backend:**  
   Handles REST APIs, JWT authentication (access/refresh tokens), validation (with Joi), business logic (in service layers), file uploads (Multer), error handling, activity logging.
 
 - **MongoDB (with Mongoose):**  
-  Stores all persistent data—users, projects, tasks (with comments and attachments), activity logs, notifications.
+  Stores all persistent data—users, projects, tasks (with comments and attachments), activity logs.
 
 - **File Storage:**  
-  Stores all uploaded attachments, either locally (in `/uploads/tasks/`) or on cloud (e.g., AWS S3, Cloudinary). Attachment URLs are referenced in task documents and served statically by the API.
+  Stores all uploaded attachments locally (in `/uploads/tasks/`). Attachment URLs are referenced in task documents and served statically by the API.
 
 ---
 
@@ -136,27 +136,34 @@ The Project Management App follows a modular, service-oriented architecture with
 
 ## Schemas
 
-- **User:** name, email, password, createdAt
+- **User:** name, email, password, role
 - **Project:** title, description, createdBy, teamMembers
 - **Task:** projectId, title, description, assignedTo, deadline, status, attachments, comments
 - **Comment:** user, message, timestamp (embedded in Task)
-- **ActivityLog:** projectId, taskId, user, action, detail, timestamp
+- **ActivityLog:** projectId, projectTitle, taskId, user, action, detail, timestamp
 
 ---
 
 ## API Endpoints
 
-- `POST /api/register` — Register user
-- `POST /api/login` — Login, returns access & refresh tokens
-- `POST /api/projects` — Create project
-- `GET /api/projects` — List user projects
-- `PUT /api/projects/:id` — Update project
-- `DELETE /api/projects/:id` — Delete project
-- `POST /api/tasks` — Create task (supports file upload)
-- `PUT /api/tasks/:id` — Update task (optionally upload files)
-- `GET /api/tasks/:projectId` — Get tasks by project
-- `POST /api/tasks/:id/comment` — Add comment to task
-- `POST /api/refresh-token` — Get new access token via refresh token
+- `POST /api/v1/user/register` — Register user
+- `POST /api/v1/user/login` — Login, returns access & refresh tokens
+- `POST /api/v1/user/refresh-token` — returns new access token via refresh token
+- `GET /api/v1/user/profile-list` — returns user profile list
+- `GET /api/v1/user/profile/:id?` — if id passesd then return selected profile details else self profile details
+- `PUT /api/v1/user/profile/:id?` — if id passed then update selected profile details else self profile
+- `POST /api/v1/project/create` — Create project
+- `GET /api/v1/project/list` — List user projects
+- `PUT /api/v1/project/update/:id` — Update project
+- `DELETE /api/v1/project/delete/:id` — Delete project
+- `GET /api/v1/project/user-projects/:id?` — returns assigned user's project list
+- `GET /api/v1/project/detail/:id` — returns project details
+- `POST /api/v1/task/add` — Create task (supports file upload)
+- `PUT /api/v1/task/modify/:taskId` — Update task (optionally upload files)
+- `GET /api/v1/task/list/:projectId` — Get tasks by project
+- `GET /api/v1/task/detail/:taskId` — Get task details
+- `POST /api/v1/task/add-comment/:taskId` — Add comment to task
+- `DELETE /api/v1/task/purge/:taskId` — Delete task
 - `GET /api/activity/:projectId` — Get project activity log
 - `GET /api/reports/progress/:projectId` — Project progress report
 - `GET /api/reports/user/:userId` — User report
@@ -179,7 +186,7 @@ The Project Management App follows a modular, service-oriented architecture with
 6. **Start Frontend (optional):**  
    `cd client && npm start`
 7. **API Testing:**  
-   Use Postman.
+   Use Postman(Collection is attached in repo).
 
 ---
 
