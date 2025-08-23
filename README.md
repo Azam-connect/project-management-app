@@ -177,20 +177,31 @@ The Project Management App follows a modular, service-oriented architecture with
 
 ## Setup & Installation
 
+- [Node.js](https://nodejs.org/) (v20 or higher recommended)
+- [MongoDB](https://www.mongodb.com/) (local or cloud, e.g., MongoDB Atlas)
+- [Docker](https://www.docker.com/) & Docker Compose (if running with Docker)
+- [Postman](https://www.postman.com/) (for API testing)
+
 1. **Clone repo:**  
    `git clone <repo-url> && cd <repo-folder>`
 2. **Install dependencies:**  
    `npm install`
 3. **Configure environment:**  
-   - Create `.env` file with MongoDB URL, JWT secrets, upload path, etc.
-4. **Create Uploads Folder:**  
-   - `uploads/tasks` for file attachments (if using local storage)
+   - Create `.env` file with MongoDB URL, JWT secrets, etc.
+4. **Run Seeder:**  
+   - `npm run seeder` for Admin user creation
 5. **Start Backend:**  
-   `npm run dev`
+   `npm run start`
 6. **Start Frontend (optional):**  
    `cd client && npm start`
 7. **API Testing:**  
    Use Postman(Collection is attached in repo).
+
+
+**🐳 Run with Docker (Alternative)**
+-  **If you prefer Docker, after Step 1 (Clone Repo):**
+
+   `docker-compose up -d`
 
 ---
 
