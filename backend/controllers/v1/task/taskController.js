@@ -12,7 +12,10 @@ class TaskController {
         ...req.body,
         attachments: fileUrls, // Attach files URLs here
       };
-      const task = await TaskService.createTask({ body: taskData });
+      const task = await TaskService.createTask({
+        body: taskData,
+        userId: req.user.userId,
+      });
       return res.status(201).json({
         success: true,
         message: 'Task created successfully',
@@ -28,7 +31,7 @@ class TaskController {
       const { projectId } = req.params;
       const { userId, role } = req.user;
       let filter = req.query || {};
-      if (!['admin','tester'].includes(role)) {
+      if (!['admin', 'tester'].includes(role)) {
         filter.assignedTo = userId;
       }
       const tasks = await TaskService.getTasksByProject(projectId, filter);
@@ -94,6 +97,7 @@ class TaskController {
       const task = await TaskService.updateTask({
         params: req.params,
         body: updateData,
+        userId: req.user.userId,
       });
       return res.status(200).json({
         success: true,

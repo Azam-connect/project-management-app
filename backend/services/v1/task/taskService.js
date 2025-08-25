@@ -7,7 +7,7 @@ const { logActivity } = require('../../../utils/logActivityUtil');
 
 class TaskService {
   // Create new task
-  async createTask({ body }) {
+  async createTask({ body, userId }) {
     try {
       const {
         projectId,
@@ -47,7 +47,7 @@ class TaskService {
           taskId: populatedTask._id,
           projectId: populatedTask.projectId._id,
           projectTitle: populatedTask.projectId.title, //  get project title
-          user: req.user.userId, //  createdBy is passed in the body
+          user: userId, //  createdBy is passed in the body
           action: 'created',
           detail: 'Task created successfully',
         }),
@@ -55,7 +55,7 @@ class TaskService {
           taskId: populatedTask._id,
           projectId: populatedTask.projectId._id,
           projectTitle: populatedTask.projectId.title, // get project title
-          user: body.assignedTo._id, // createdBy is passed in the body
+          user: populatedTask.assignedTo._id, // createdBy is passed in the body
           action: 'assigned',
           detail: 'Task assigned successfully',
         }),
@@ -94,7 +94,10 @@ class TaskService {
 
       const [tasks, totalTasks] = await Promise.all([
         Task.find(query)
-          .populate('assignedTo', 'name email')
+          .populate([
+            { path: 'assignedTo', select: 'name email' },
+            { path: 'projectId', select: 'title' },
+          ])
           .skip(skip)
           .limit(limit)
           .sort({ createdAt: -1 }),
@@ -133,7 +136,7 @@ class TaskService {
   }
 
   // Update task details
-  async updateTask({ params, body }) {
+  async updateTask({ params, body, userId }) {
     try {
       const taskId = params.taskId;
       const { title, description, assignedTo, status, deadline, attachments } =
@@ -162,7 +165,7 @@ class TaskService {
         taskId: task._id,
         projectId: task.projectId._id,
         projectTitle: task.projectId.title, // get project title
-        user: req.user.userId, // Assuming updatedBy is passed in the body
+        user: userId, // Assuming updatedBy is passed in the body
         action: 'updated',
         detail: 'Task updated successfully with status: ' + task.status,
       });
