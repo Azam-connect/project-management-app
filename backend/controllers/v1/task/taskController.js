@@ -112,7 +112,10 @@ class TaskController {
   async deleteTask(req, res, next) {
     try {
       const { taskId } = req.params;
-      const task = await TaskService.deleteTask(taskId);
+      const task = await TaskService.deleteTask({
+        taskId,
+        userId: req.user.userId,
+      });
       if (!task) {
         return res.status(404).json({
           success: false,

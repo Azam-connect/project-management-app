@@ -177,7 +177,7 @@ class TaskService {
   }
 
   // Delete a task
-  async deleteTask(taskId) {
+  async deleteTask({ taskId, userId }) {
     try {
       const task = await Task.findByIdAndDelete(taskId).populate([
         { path: 'projectId', select: 'title' },
@@ -187,7 +187,7 @@ class TaskService {
         taskId: task._id,
         projectId: task.projectId._id,
         projectTitle: task.projectId.title, // get project title
-        user: req.user.userId, // Assuming deletedBy is passed in the body
+        user: userId, // Assuming deletedBy is passed in the body
         action: 'deleted',
         detail: 'Task deleted successfully',
       });
