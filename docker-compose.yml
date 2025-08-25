@@ -1,0 +1,46 @@
+services:
+  db:
+    image: mongo:latest
+    container_name: pma-mongo
+    # restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: tiger
+    # ports:
+    #   - 27017:27017
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - pma-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--username", "root", "--password", "tiger", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: dockerfiles/app.dockerfile
+    container_name: pma-backend
+    # restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - 3001:3001
+    command: ["npm", "run", "start"]
+    volumes:
+      - logs:/backend/logs
+      - uploads:/backend/uploads
+    networks:
+      - pma-network
+
+volumes:
+  mongo-data:
+  logs:
+  uploads:
+
+networks:
+  pma-network:
+    driver: bridge
