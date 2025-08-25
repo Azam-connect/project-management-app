@@ -8,6 +8,11 @@ const {
 const { upload } = require('../../../utils/fileUploadUtil');
 
 router.get(
+  '/list',
+  validateAccessToken,
+  TaskController.getTasksByProject
+);
+router.get(
   '/list/:projectId',
   validateAccessToken,
   TaskController.getTasksByProject

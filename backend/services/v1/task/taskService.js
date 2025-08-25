@@ -70,7 +70,7 @@ class TaskService {
   // Get tasks by project with optional filters
   async getTasksByProject(projectId, filter = {}) {
     try {
-      if (!projectId) throw new Error('Project ID is required');
+      // if (!projectId) throw new Error('Project ID is required');
 
       // Default page & limit if not provided
       const page = parseInt(filter?.page, 10) || 1;
@@ -81,9 +81,15 @@ class TaskService {
       }
 
       const skip = (page - 1) * limit;
-      let query = { projectId };
+      let query = {};
+      if (projectId) {
+        query.projectId = projectId;
+      }
       if (filter?.status) {
         query.status = filter.status;
+      }
+      if (filter?.assignedTo) {
+        query.assignedTo = filter.assignedTo;
       }
 
       const [tasks, totalTasks] = await Promise.all([

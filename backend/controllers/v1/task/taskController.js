@@ -26,7 +26,11 @@ class TaskController {
   async getTasksByProject(req, res, next) {
     try {
       const { projectId } = req.params;
-      const filter = req.query || {};
+      const { userId, role } = req.user;
+      let filter = req.query || {};
+      if (['admin','tester'].includes(role)) {
+        filter.assignedTo = userId;
+      }
       const tasks = await TaskService.getTasksByProject(projectId, filter);
       return res.status(200).json({
         success: true,
