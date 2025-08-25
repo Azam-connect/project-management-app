@@ -150,16 +150,34 @@ class TaskService {
       if (deadline !== undefined) updates.deadline = deadline;
       if (attachments !== undefined) updates.attachments = attachments;
 
-      const task = await Task.findByIdAndUpdate(taskId, updates, {
-        new: true,
-        runValidators: true,
-      }).populate([
+      // const task = await Task.findByIdAndUpdate(taskId, updates, {
+      //   new: true,
+      //   runValidators: true,
+      // }).populate([
+      //   { path: 'projectId', select: 'title' },
+      //   { path: 'assignedTo', select: 'name email' },
+      //   { path: 'comments.user', select: 'name email' },
+      // ]);
+      let task = await Task.findById(taskId);
+
+      if (!task) throw new Error('Task not found');
+
+      if (task.status === 'todo') {
+        Object.assign(task, updates);
+      } else {
+        if (updates.status && updates.status != task.status) {
+          task.status = updates.status;
+        }
+      }
+
+      await task.validate();
+      await task.save();
+
+      task = await Task.findById(taskId).populate([
         { path: 'projectId', select: 'title' },
         { path: 'assignedTo', select: 'name email' },
         { path: 'comments.user', select: 'name email' },
       ]);
-
-      if (!task) throw new Error('Task not found');
 
       await logActivity({
         taskId: task._id,
