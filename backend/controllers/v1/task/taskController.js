@@ -28,7 +28,7 @@ class TaskController {
       const { projectId } = req.params;
       const { userId, role } = req.user;
       let filter = req.query || {};
-      if (['admin','tester'].includes(role)) {
+      if (!['admin','tester'].includes(role)) {
         filter.assignedTo = userId;
       }
       const tasks = await TaskService.getTasksByProject(projectId, filter);
