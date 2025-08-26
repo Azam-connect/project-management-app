@@ -110,14 +110,17 @@ class ReportService {
 
   // 5. Daily user activity report (tasks created, updated, commented, etc.) for a date range
   async getUserDailyActivity(userId, startDate, endDate) {
-    if (!userId) throw new Error('User ID is required');
+    // if (!userId) throw new Error('User ID is required');
     if (!startDate || !endDate)
       throw new Error('Start and end dates are required');
 
-    const activities = await ActivityLog.find({
-      user: userId,
+    let query = {
       createdAt: { $gte: new Date(startDate), $lte: new Date(endDate) },
-    }).sort({ createdAt: 1 });
+    };
+    if (userId) {
+      query.user = userId;
+    }
+    const activities = await ActivityLog.find(query).sort({ createdAt: 1 });
 
     // Group by date (YYYY-MM-DD)
     const grouped = activities.reduce((acc, activity) => {
@@ -141,13 +144,19 @@ class ReportService {
         const matchTask = { assignedTo: userId };
         if (projectId) matchTask.projectId = projectId;
 
-        const [totalTasks, completedTasks, activityCount, user] = await Promise.all([Task.countDocuments(matchTask), Task.countDocuments({
-          ...matchTask,
-          status: 'done',
-        }), ActivityLog.countDocuments({
-          user: userId,
-          ...(projectId && { projectId }),
-        }), User.findById(userId).select('name email')]);
+        const [totalTasks, completedTasks, activityCount, user] =
+          await Promise.all([
+            Task.countDocuments(matchTask),
+            Task.countDocuments({
+              ...matchTask,
+              status: 'done',
+            }),
+            ActivityLog.countDocuments({
+              user: userId,
+              ...(projectId && { projectId }),
+            }),
+            User.findById(userId).select('name email'),
+          ]);
 
         return {
           userId,
@@ -198,7 +207,9 @@ class ReportService {
         Description: task.description,
         AssignedTo: task.assignedTo ? task.assignedTo.name : '',
         Status: task.status,
-        Deadline: task.deadline ? task.deadline.toISOString().split('T')[0] : '',
+        Deadline: task.deadline
+          ? task.deadline.toISOString().split('T')[0]
+          : '',
         CreatedAt: task.createdAt.toISOString().split('T')[0],
       });
     });
@@ -208,9 +219,14 @@ class ReportService {
     return buffer;
   }
 
-  async activityLogReport({ projectId = null, user = null, page = 1, limit = 10 }) {
+  async activityLogReport({
+    projectId = null,
+    user = null,
+    page = 1,
+    limit = 10,
+  }) {
     try {
-      let query = {}
+      let query = {};
       if (projectId) {
         query.projectId = projectId;
       }
@@ -227,13 +243,14 @@ class ReportService {
       const [activities, totalRecord] = await Promise.all([
         ActivityLog.find(query)
           .populate([
-            { path: "projectId", select: "title description" },
-            { path: "user", select: "name email role -password" }
+            { path: 'projectId', select: 'title description' },
+            { path: 'taskId', select: 'title status' },
+            { path: 'user', select: 'name email role' },
           ])
           .skip(skip)
           .limit(limit)
           .sort({ createdAt: -1 }),
-        ActivityLog.countDocuments(query)
+        ActivityLog.countDocuments(query),
       ]);
 
       return {
@@ -243,10 +260,10 @@ class ReportService {
           pageSize: limit,
           totalRecord,
           totalPages: Math.ceil(totalRecord / limit),
-        }
-      }
+        },
+      };
     } catch (err) {
-      throw err
+      throw err;
     }
   }
 }

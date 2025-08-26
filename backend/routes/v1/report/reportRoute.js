@@ -26,6 +26,11 @@ router.get(
   ReportController.getUserProjectReportSummary
 );
 router.get(
+  '/user-daily-activity',
+  validateAccessToken,
+  ReportController.getUserDailyActivity
+);
+router.get(
   '/user-daily-activity/:userId',
   validateAccessToken,
   ReportController.getUserDailyActivity
@@ -35,7 +40,15 @@ router.post(
   validateAccessToken,
   ReportController.getUserComparison
 );
-router.get('/export-task-report', validateAccessToken, ReportController.exportTasksReport);
-router.get('/activity', validateAccessToken, ReportController.activityLogReport);
+router.get(
+  '/export-task-report',
+  validateAccessToken,
+  ReportController.exportTasksReport
+);
+router.get(
+  '/activity',
+  validateAccessToken,
+  ReportController.activityLogReport
+);
 
 module.exports = router;

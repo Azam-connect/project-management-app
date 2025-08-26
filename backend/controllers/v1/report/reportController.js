@@ -73,7 +73,10 @@ class ReportController {
       const { projectId } = req.query;
       const report = await ReportService.exportTasksReport(projectId);
       res.setHeader('Content-Type', 'text/csv');
-      res.setHeader('Content-Disposition', 'attachment; filename="tasks_report.csv"');
+      res.setHeader(
+        'Content-Disposition',
+        'attachment; filename="tasks_report.csv"'
+      );
       return res.status(200).json(report);
     } catch (error) {
       next(error);
@@ -83,23 +86,23 @@ class ReportController {
   async activityLogReport(req, res, next) {
     try {
       const { projectId, userId, currentPage, pageSize } = req.query;
-      dataSet = {}
+      let dataSet = {};
       if (projectId) {
         dataSet.projectId = projectId;
       }
-      if (user) {
+      if (userId) {
         dataSet.user = userId;
       }
       if (currentPage) {
         dataSet.page = currentPage;
       }
       if (pageSize) {
-        dataSet.page = pageSize;
+        dataSet.limit = pageSize;
       }
       const activity = await ReportService.activityLogReport(dataSet);
       return res.status(200).json(activity);
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 }
