@@ -21,7 +21,7 @@ function validateAccessToken(req, res, next) {
       }
 
       // Attach decoded token payload to request object for downstream handlers
-      req.user = { userId: decoded.userId, email: decoded.email };
+      req.user = { userId: decoded.userId, email: decoded.email, role: decoded.role };
       next();
     });
   } catch (err) {

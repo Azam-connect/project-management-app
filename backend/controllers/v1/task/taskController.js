@@ -1,5 +1,6 @@
 const { TaskService } = require('../../../services');
 const { Task } = require('../../../models');
+const { log } = require('../../../utils/debugger');
 
 class TaskController {
   async createTask(req, res, next) {
@@ -33,8 +34,6 @@ class TaskController {
       let filter = req.query || {};
       if (!['admin', 'tester'].includes(role)) {
         filter.assignedTo = userId;
-      }else{
-        filter.assignedTo = null;
       }
       const tasks = await TaskService.getTasksByProject(projectId, filter);
       return res.status(200).json({
