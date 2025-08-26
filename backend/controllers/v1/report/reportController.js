@@ -72,12 +72,16 @@ class ReportController {
     try {
       const { projectId } = req.query;
       const report = await ReportService.exportTasksReport(projectId);
-      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader(
+        'Content-Type',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      );
       res.setHeader(
         'Content-Disposition',
-        'attachment; filename="tasks_report.csv"'
+        'attachment; filename="tasks_report.xlsx"'
       );
-      return res.status(200).json(report);
+      await report.xlsx.write(res);
+      res.end();
     } catch (error) {
       next(error);
     }

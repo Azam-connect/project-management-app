@@ -184,13 +184,11 @@ class ReportService {
       throw new Error('No tasks found for the specified project');
     }
 
-    // Create workbook and worksheet
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Tasks Report');
 
-    // Define columns
     worksheet.columns = [
-      { header: 'TaskId', key: 'TaskId', width: 30 },
+      // { header: 'TaskId', key: 'TaskId', width: 30 },
       { header: 'Title', key: 'Title', width: 30 },
       { header: 'Description', key: 'Description', width: 40 },
       { header: 'AssignedTo', key: 'AssignedTo', width: 25 },
@@ -199,10 +197,9 @@ class ReportService {
       { header: 'CreatedAt', key: 'CreatedAt', width: 20 },
     ];
 
-    // Map to simple objects for CSV export
-    tasks.map((task) => {
+    tasks.forEach((task) => {
       worksheet.addRow({
-        TaskId: task._id.toString(),
+        // TaskId: task._id.toString(),
         Title: task.title,
         Description: task.description,
         AssignedTo: task.assignedTo ? task.assignedTo.name : '',
@@ -214,9 +211,7 @@ class ReportService {
       });
     });
 
-    // Generate buffer for download
-    const buffer = await workbook.xlsx.writeBuffer();
-    return buffer;
+    return workbook; // return workbook
   }
 
   async activityLogReport({
