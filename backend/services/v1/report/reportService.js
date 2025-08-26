@@ -35,7 +35,9 @@ class ReportService {
       inProgressTasks,
       todoTasks,
       testingTasks,
-      completionRate: totalTasks ? (completedTasks / totalTasks) * 100 : 0,
+      completionRate: Number(
+        (totalTasks ? (completedTasks / totalTasks) * 100 : 0).toFixed(2)
+      ),
     };
   }
 
