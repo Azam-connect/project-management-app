@@ -77,9 +77,9 @@ class ProjectService {
   // Get all projects a user is part of
   async getUserProjects(req, res, next) {
     try {
-      const userId = (req.params.id || req.user.userId) ?? null; // Get user ID from params or request object
-      if (!userId) {
-        throw new Error('User ID is required');
+      let userId = req?.params?.id || null; //?? null; // Get user ID from params or request object
+      if (!userId && req.user.role !== 'admin') {
+        userId = req.user.userId;
       }
       // Default page & limit if not provided
       const page = parseInt(req.query.currentPage, 10) || 1;
@@ -91,8 +91,12 @@ class ProjectService {
       }
 
       const skip = (page - 1) * limit;
-      let query = { teamMembers: userId };
-      let taskQuery = { assignedTo: userId };
+      let query = {};
+      let taskQuery = {};
+      if (userId) {
+        query = { teamMembers: userId };
+        taskQuery = { assignedTo: userId };
+      }
       let projects = [];
       let totalProjects = 0;
       if (status) {
@@ -205,7 +209,13 @@ class ProjectService {
       if (!projectId) {
         throw new Error('Project ID is required');
       }
-      const [project, totalInProgessTask, totalTestingTask, totalRejectRejectTask, totalDoneTask] = await Promise.all([
+      const [
+        project,
+        totalInProgessTask,
+        totalTestingTask,
+        totalRejectRejectTask,
+        totalDoneTask,
+      ] = await Promise.all([
         Project.findById(projectId),
         Task.countDocuments({ status: 'in-progess' }),
         Task.countDocuments({ status: 'testing' }),
@@ -213,10 +223,16 @@ class ProjectService {
         Task.countDocuments({ status: 'done' }),
       ]);
       if (!project) throw new Error('Project not found');
-      if (totalInProgessTask || totalTestingTask || totalRejectRejectTask || totalDoneTask) throw new Error("Project is already assigned with Tasks!!");
+      if (
+        totalInProgessTask ||
+        totalTestingTask ||
+        totalRejectRejectTask ||
+        totalDoneTask
+      )
+        throw new Error('Project is already assigned with Tasks!!');
       await Promise.all([
         Project.findByIdAndDelete(projectId),
-        Task.deleteMany({ projectId })
+        Task.deleteMany({ projectId }),
       ]);
 
       await logActivity({
