@@ -205,8 +205,20 @@ class ProjectService {
       if (!projectId) {
         throw new Error('Project ID is required');
       }
-      const project = await Project.findByIdAndDelete(projectId);
+      const [project, totalInProgessTask, totalTestingTask, totalRejectRejectTask, totalDoneTask] = await Promise.all([
+        Project.findById(projectId),
+        Task.countDocuments({ status: 'in-progess' }),
+        Task.countDocuments({ status: 'testing' }),
+        Task.countDocuments({ status: 'rejected' }),
+        Task.countDocuments({ status: 'done' }),
+      ]);
       if (!project) throw new Error('Project not found');
+      if (totalInProgessTask || totalTestingTask || totalRejectRejectTask || totalDoneTask) throw new Error("Project is already assigned with Tasks!!");
+      await Promise.all([
+        Project.findByIdAndDelete(projectId),
+        Task.deleteMany({ projectId })
+      ]);
+
       await logActivity({
         projectId: project._id,
         projectTitle: project.title,

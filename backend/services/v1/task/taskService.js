@@ -201,6 +201,7 @@ class TaskService {
         { path: 'projectId', select: 'title' },
       ]);
       if (!task) throw new Error('Task not found');
+      if (task.status !== 'todo') throw new Error('Work on this Task is already started!!');
       await logActivity({
         taskId: task._id,
         projectId: task.projectId._id,
