@@ -16,7 +16,7 @@ A full-stack CRUD app for managing projects, tasks, team collaboration, file att
 8. [Reporting](#reporting)
 9. [File Upload (Attachments)](#file-upload-attachments)
 10. [Activity Log](#activity-log)
-11. [Further Improvements](#further-improvements)
+11. [User Roles & Access Control](#user-roles--access-control)
 
 ---
 
@@ -232,12 +232,33 @@ The Project Management App follows a modular, service-oriented architecture with
 
 ---
 
-## Further Improvements
+## User Roles & Access Control
 
-- Real-time notifications (Socket.io)
-- Cloud uploads (AWS S3, Cloudinary)
-- User roles/permissions
-- Gantt charts or advanced reporting
-- UI/UX enhancements & mobile responsive design
+The application uses **role-based access control** to manage permissions and actions for each user. This ensures secure and organized collaboration in projects.
+
+### Roles and Permissions
+
+| **Role**       | **Permissions**                                                                                                       |
+|----------------|----------------------------------------------------------------------------------------------------------------------|
+| **Admin**      | - Full access to all features and data<br>- Manage users, projects, tasks, activity logs, comments, and notifications<br>- Change any task status<br>- View all reports and logs |
+| **Developer**  | - Create new tasks<br>- View and modify tasks<br>- View activity logs<br>- Change status of assigned tasks to "complete"                               |
+
+---
+
+**Details:**
+
+- **Admin**
+  - Can access, create, edit, and delete all projects, tasks, users, activity logs, and notifications.
+  - Can manage team members and assign user roles.
+  - Has unrestricted control over all data and system settings.
+- **Developer**
+  - Can create new tasks in assigned projects.
+  - Can view the activity log for projects where they are a team member.
+  - Can change the status of their assigned tasks to "complete".
+
+**Role Assignment:**
+
+- Admin assigns roles to users during user creation or user management.
+- Role-based middleware checks permissions for each protected route and API.
 
 ---
